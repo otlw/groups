@@ -39,14 +39,14 @@ contract Group
     stake = _stake;
   }
 
-  function addMember(address member) returns(bool) 
+  function addMember(address member) returns(bool)
   {
-    if(members.length() >= size)
+    if(members.length >= size)
     {
       return false;
     }
 
-    for (uint i = 0, i <= requirements.length(), i++)
+    for (uint i = 0, i <= requirements.length, i++)
     {
       if(User(member).getConceptPassed(requirements[i]) == false)
       {
@@ -65,7 +65,7 @@ contract Group
   function setDone()
   {
     done(msg.sender) = true;
-    for(uint i = 0, if i <= members.length(), i++)
+    for(uint i = 0, if i <= members.length, i++)
     {
       if(done[members[i]] == false)
       {
@@ -80,7 +80,7 @@ contract Group
     return User(user).extStartAssessment(concept, time, size);
   }
 
-  function getStake(address user, uint value) {
+  function getStake(address user, uint value) onlythis returns bool{
     return User(user).extTransferTokens(address(this), value);
   }
 }

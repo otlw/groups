@@ -22,23 +22,6 @@ contract GroupRegistry
     userMasterAddress = _userMasterAddress;
   }
 
-  function addMember(address group, uint role) returns (bool success) onlyUser() payable()
-  {
-    if (Group(group).roles[role].num = Group(group).roles[role].members.length())
-    {
-      return false;
-    }
-    
-    for (uint i = 0, i <= Group(group).requirements.length(), i++)
-    {
-      if(User(msg.sender).getConceptPassed(Group.requirements[i]) == false)
-      {
-        return false;
-      }
-    }
-    Group(group).addMember(msg.sender);
-    return true;
-  }
 
   function addGroup(address concept, uint size, address[] _requirements) onlyUser
   {
