@@ -1,25 +1,25 @@
 import ../user.sol
-import ../userMaster.sol
+import ../userRegistry.sol
 import group.sol
 
 contract GroupRegistry
 {
   mapping (address => address[]) groups;
   mapping (address => address) conceptFromGroup;
-  address userMasterAddress;
+  address userRegistryAddress;
 
   modifier onlyUser()
   {
-    if(userMaster(userMasterAddress).getTokenBalance(msg.sender) <= 0)
+    if(userRegistry(userRegistryAddress).getTokenBalance(msg.sender) <= 0)
     {
       throw;
     }
     _;
   }
 
-  function GroupRegistry(address _userMasterAddress)
+  function GroupRegistry(address _userRegistryAddress)
   {
-    userMasterAddress = _userMasterAddress;
+    userRegistryAddress = _userRegistryAddress;
   }
 
 
