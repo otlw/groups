@@ -9,7 +9,12 @@ contract Group
   address[] public requirements;
   address concept;
   address registry;
-  mapping (address => bool) done;
+  mapping (address => address) memberData;
+
+  struct Member {
+    address assessments;
+    bool done;
+  }
 
   modifier onlyRegistry()
   {
@@ -54,20 +59,21 @@ contract Group
       }
     }
 
-    if (User(member)).extTransferTokens(address(this), stake) != true)
+    if (getStake(member, stake) != true)
     {
       return false;
     }
+
     members.push(member);
     return true;
   }
 
   function setDone()
   {
-    done(msg.sender) = true;
+    memberData(msg.sender).done = true;
     for(uint i = 0, if i <= members.length, i++)
     {
-      if(done[members[i]] == false)
+      if(memberData[members[i]].done == false)
       {
         return;
       }
