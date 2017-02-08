@@ -1,4 +1,5 @@
-import ../assess/user.sol
+import "../assess/user.sol";
+import "../assess/userRegistry.sol";
 
 contract Group
 {
@@ -9,10 +10,13 @@ contract Group
   address[] public requirements;
   address concept;
   address registry;
-  mapping (address => address) memberData;
+  address userRegistry;
+  mapping (address => Member) memberData;
+  int state; //1 = started,
 
   struct Member {
-    address assessments;
+    mapping (address => bool) votes;
+    address finalAssessment;
     bool done;
   }
 
@@ -34,14 +38,16 @@ contract Group
     _;
   }
 
-  function Group(address _concept, uint _size, uint _stake, address[] _requirements)
+  function Group(address _concept, uint _size, uint _stake, address[] _requirements, address _userRegistry)
   {
     concept = _concept;
     registry = msg.sender;
+    userRegistry = _userRegistry;
     requirements = _requirements;
     addMember(msg.sender);
     size = _size;
     stake = _stake;
+    state = 1;
   }
 
   function addMember(address member) returns(bool)
@@ -51,7 +57,7 @@ contract Group
       return false;
     }
 
-    for (uint i = 0, i <= requirements.length, i++)
+    for (uint i = 0; i <= requirements.length; i++)
     {
       if(User(member).getConceptPassed(requirements[i]) == false)
       {
@@ -71,22 +77,50 @@ contract Group
   function setDone()
   {
     memberData(msg.sender).done = true;
-    for(uint i = 0, if i <= members.length, i++)
+    for(uint i = 0; i <= members.length; i++)
     {
       if(memberData[members[i]].done == false)
       {
         return;
       }
     }
-    //Call some thing to do if the whole group is done here
+    state = false;
   }
 
-  function makeAssessment(address user, address concept, uint time, uint size) onlyThis returns bool
+  function startFinalAssessment(address user) onlyThis{
+    userData[user].finalAssessment = makeAssessment(user, concept);
+    if(userData[user].finalAssessment != true){
+      return;
+    }
+  }
+
+  function makeAssessment(address _user, address _concept, uint _time, uint _size) onlyThis returns(bool)
   {
-    return User(user).extStartAssessment(concept, time, size);
+    return User(_user).extStartAssessment(_concept, _time, _size);
   }
 
-  function getStake(address user, uint value) onlythis returns bool{
+  function getStake(address user, uint value) onlythis returns(bool)
+  {
     return User(user).extTransferTokens(address(this), value);
+  }
+
+  function returnStake(address user)
+  {
+    if(!state){
+      //UserRegistry(us)
+    }
+  }
+  function kick(address user) {
+    memberData[user].votes[msg.sender] = true;
+    for(uint i=0; i < members.length; i++)
+    {
+      if(!memberData[user].votes[members[i]])
+      {
+        return;
+      }
+    }
+    //The process for kicking out a member goes here
+
+
   }
 }
