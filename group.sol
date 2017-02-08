@@ -1,5 +1,7 @@
-import "../assess/user.sol";
-import "../assess/userRegistry.sol";
+pragma solidity ^0.4.0;
+
+import "assess/user.sol";
+import "assess/userRegistry.sol";
 
 contract Group
 {
@@ -12,7 +14,11 @@ contract Group
   address registry;
   address userRegistry;
   mapping (address => Member) memberData;
-  int state; //1 = started,
+  enum State {
+    Init,
+    Done
+  }
+  State state; //1 = started,
 
   struct Member {
     mapping (address => bool) votes;
@@ -47,7 +53,7 @@ contract Group
     addMember(msg.sender);
     size = _size;
     stake = _stake;
-    state = 1;
+    state = State.Init;
   }
 
   function addMember(address member) returns(bool)
@@ -59,7 +65,7 @@ contract Group
 
     for (uint i = 0; i <= requirements.length; i++)
     {
-      if(User(member).getConceptPassed(requirements[i]) == false)
+      if(User(member).conceptPassed(requirements[i]) == false)
       {
         return false;
       }
@@ -76,7 +82,7 @@ contract Group
 
   function setDone()
   {
-    memberData(msg.sender).done = true;
+    memberData[msg.sender].done = true;
     for(uint i = 0; i <= members.length; i++)
     {
       if(memberData[members[i]].done == false)
@@ -84,37 +90,37 @@ contract Group
         return;
       }
     }
-    state = false;
+    state = State.Done;
   }
 
-  function startFinalAssessment(address user) onlyThis{
-    userData[user].finalAssessment = makeAssessment(user, concept);
-    if(userData[user].finalAssessment != true){
-      return;
-    }
-  }
+  //function startFinalAssessment(address member) onlyThis{
+    //memberData[member].finalAssessment = makeAssessment(member, concept, );
+    //if(memberData[member].finalAssessment != true){
+      //return;
+    //}
+  //}
 
-  function makeAssessment(address _user, address _concept, uint _time, uint _size) onlyThis returns(bool)
+  function makeAssessment(address _member, address _concept, uint _time, uint _size) onlyThis returns(bool)
   {
-    return User(_user).extStartAssessment(_concept, _time, _size);
+    return User(_member).extMakeAssessment(_concept, _time, _size);
   }
 
-  function getStake(address user, uint value) onlythis returns(bool)
+  function getStake(address user, uint value) onlyThis returns(bool)
   {
     return User(user).extTransferTokens(address(this), value);
   }
 
   function returnStake(address user)
   {
-    if(!state){
+    if(state == State.Done){
       //UserRegistry(us)
     }
   }
-  function kick(address user) {
-    memberData[user].votes[msg.sender] = true;
+  function kick(address member) {
+    memberData[member].votes[msg.sender] = true;
     for(uint i=0; i < members.length; i++)
     {
-      if(!memberData[user].votes[members[i]])
+      if(!memberData[member].votes[members[i]])
       {
         return;
       }

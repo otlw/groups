@@ -1,6 +1,8 @@
-import ../user.sol
-import ../userRegistry.sol
-import group.sol
+pragma solidity ^0.4.0;
+
+import 'assess/user.sol';
+import 'assess/userRegistry.sol';
+import 'group.sol';
 
 contract GroupRegistry
 {
@@ -10,7 +12,7 @@ contract GroupRegistry
 
   modifier onlyUser()
   {
-    if(userRegistry(userRegistryAddress).getTokenBalance(msg.sender) <= 0)
+    if(UserRegistry(userRegistryAddress).balances(msg.sender) <= 0)
     {
       throw;
     }
@@ -23,10 +25,10 @@ contract GroupRegistry
   }
 
 
-  function addGroup(address concept, uint size, address[] _requirements) onlyUser
+  function addGroup(address concept, uint size, uint stake, address[] requirements) onlyUser
   {
-    Group newGroup = new Group(concept, size, msg.sender);
-    groups[concept].push(address(Group));
-    conceptFromGroup[address(group)] = concept;
+    Group newGroup = new Group(concept, size, stake, requirements, userRegistryAddress);
+    groups[concept].push(address(newGroup));
+    conceptFromGroup[address(newGroup)] = concept;
   }
 }
