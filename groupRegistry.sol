@@ -4,8 +4,8 @@ import group.sol
 
 contract GroupRegistry
 {
-  mapping (address => address[]) groups;
-  mapping (address => address) conceptFromGroup;
+  mapping (address => address[]) public groups;
+  mapping (address => address) public conceptFromGroup;
   address userRegistryAddress;
 
   modifier onlyUser()
